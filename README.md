@@ -11,9 +11,9 @@ A program that automates actions in the crypto game “Major”
 **The program does automation with post queries, the actions it automatically performs:**
 
 * Get daily reward
-* Start game **"coins"**
+* Start game **"coins"** : 885 - 915
 * Start game **"roulette"**
-* Start game **"swipe"**
+* Start game **"swipe"** : 2300 +- 150
 
 The program sends requests using an authorization token that is different for each account, and thanks to the token the authorization takes place.
 [How to get "query"](#how-to-get-query)
