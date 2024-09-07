@@ -123,8 +123,6 @@ def get_coins_game(headers: dict, max_attempts: int):
 
 
 def post_coins_game(headers: dict, max_attempts: int):
-    # 885
-    # 2100 =- 100
     print(Fore.YELLOW + Style.BRIGHT + "Attempting to post coins game......")
     url = "https://major.glados.app/api/bonuses/coins/"
     coins = random.choice([885, 915])
