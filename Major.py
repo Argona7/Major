@@ -4,9 +4,12 @@ import time
 import random
 import requests
 
+from ctypes import windll
 from text import print_name, clear_console
 from colorama import Fore, Style
 from typing import Union
+
+windll.kernel32.SetConsoleTitleW("Major Hack by Argona")
 
 
 # {"Account Name":["query","user-agent"]}
@@ -89,6 +92,84 @@ def visit(headers: dict, max_attempts: int) -> bool:
     return False
 
 
+def get_daily_tasks(headers: dict, max_attempts: int) -> dict:
+    print(Fore.YELLOW + Style.BRIGHT + "Attempting to get daily tasks......")
+    params = {"is_daily": "true"}
+    url = "https://major.bot/api/tasks/"
+    for _ in range(max_attempts):
+        response = requests.get(url=url, headers=headers, params=params)
+        if response.status_code == 200:
+            print(Fore.LIGHTGREEN_EX + "Successful!")
+            time.sleep(2)
+            return response.json()
+        else:
+            print(Fore.LIGHTBLACK_EX + f"Error: status code {response.status_code}")
+            print(Fore.LIGHTBLACK_EX + "Attempting to reconnect")
+            time.sleep(2)
+
+    print(Fore.LIGHTRED_EX + "Failed to get daily tasks")
+    return {}
+
+
+def get_permanent_tasks(headers: dict, max_attempts: int) -> dict:
+    print(Fore.YELLOW + Style.BRIGHT + "Attempting to get permanent tasks......")
+    params = {"is_daily": "false"}
+    url = "https://major.bot/api/tasks/"
+    for _ in range(max_attempts):
+        response = requests.get(url=url, headers=headers, params=params)
+        if response.status_code == 200:
+            print(Fore.LIGHTGREEN_EX + "Successful!")
+            time.sleep(2)
+            return response.json()
+        else:
+            print(Fore.LIGHTBLACK_EX + f"Error: status code {response.status_code}")
+            print(Fore.LIGHTBLACK_EX + "Attempting to reconnect")
+            time.sleep(2)
+
+    print(Fore.LIGHTRED_EX + "Failed to get permanent tasks")
+    return {}
+
+
+def post_task(task: int, name_task: str, headers: dict, max_attempts: int):
+    print(Fore.YELLOW + Style.BRIGHT + f"Attempting to post task: {name_task}")
+    url = "https://major.bot/api/tasks/"
+    body = {"task_id": task}
+    for _ in range(max_attempts):
+        response = requests.post(url=url, headers=headers, json=body)
+        if response.status_code == 201:
+            if response.json()["is_completed"]:
+                print(Fore.LIGHTGREEN_EX + "Successful!")
+            else:
+                print(Fore.LIGHTRED_EX + "Failure")
+            time.sleep(2)
+            return True
+        else:
+            print(Fore.LIGHTBLACK_EX + f"Error: status code {response.status_code}")
+            print(Fore.LIGHTBLACK_EX + "Attempting to reconnect")
+            time.sleep(2)
+
+    print(Fore.LIGHTRED_EX + f"Failed to post task: {name_task}")
+    return False
+
+
+def tasks(headers: dict):
+    tasks_daily = get_daily_tasks(headers, 3)
+    if tasks_daily:
+        for i in tasks_daily:
+            if i["id"] in [29, 16, 5]:
+                if not i["is_completed"]:
+                    post_task(i["id"], i["title"], headers, 3)
+                    time.sleep(2.5)
+
+    task_permanent = get_permanent_tasks(headers, 3)
+    if task_permanent:
+        for i in task_permanent:
+            if not i["is_completed"]:
+                if not i["id"] in [33, 21, 20]:
+                    post_task(i["id"], i["title"], headers, 3)
+                    time.sleep(2.5)
+
+
 def get_streak_daily(headers: dict):
     url = "https://major.glados.app/api/user-visits/streak/"
     response = requests.get(url=url, headers=headers)
@@ -96,7 +177,6 @@ def get_streak_daily(headers: dict):
         time.sleep(2)
     else:
         time.sleep(2)
-
 
 
 def get_coins_game(headers: dict, max_attempts: int):
@@ -263,9 +343,10 @@ def main():
 
                 visit(headers, 3)
                 get_streak_daily(headers)
-                if get_coins_game(headers,3):
+                tasks(headers)
+                if get_coins_game(headers, 3):
                     time.sleep(60)
-                    post_coins_game(headers,3)
+                    post_coins_game(headers, 3)
                 if get_roulette_game(headers, 3):
                     time.sleep(10)
                     post_roulette_game(headers, 3)
