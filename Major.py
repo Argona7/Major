@@ -70,7 +70,7 @@ def get_access_token(query: str, user_agent: str, max_attempts: int) -> str:
             print(Fore.LIGHTBLACK_EX + "Attempting to reconnect")
             time.sleep(2)
 
-    print(Fore.LIGHTRED_EX + "Failed to get user!")
+    print(Fore.LIGHTRED_EX + "Failed to get access token!")
     return ""
 
 
@@ -173,10 +173,8 @@ def tasks(headers: dict):
 def get_streak_daily(headers: dict):
     url = "https://major.glados.app/api/user-visits/streak/"
     response = requests.get(url=url, headers=headers)
-    if response.status_code == 200:
-        time.sleep(2)
-    else:
-        time.sleep(2)
+    print(Fore.YELLOW + Style.BRIGHT + f"Send streak daily: {response.status_code}")
+    time.sleep(1)
 
 
 def get_coins_game(headers: dict, max_attempts: int):
@@ -306,6 +304,57 @@ def post_swipe_game(headers: dict, max_attempts: int):
     return False
 
 
+def get_durov(headers: dict, max_attempts: int):
+    print(Fore.YELLOW + Style.BRIGHT + "Attempting to get durov info......")
+    url = "https://major.bot/api/durov/"
+    for _ in range(max_attempts):
+        response = requests.get(url=url, headers=headers)
+        if response.status_code == 200:
+            print(Fore.LIGHTGREEN_EX + "Successful!")
+            time.sleep(2)
+            return True
+        else:
+            data = response.json()
+            if "detail" in data:
+                print(Fore.LIGHTMAGENTA_EX + "The durov game has already been played!")
+                time.sleep(2)
+                return False
+            print(Fore.LIGHTBLACK_EX + f"Error: status code {response.status_code}")
+            print(Fore.LIGHTBLACK_EX + "Attempting to reconnect")
+            time.sleep(2)
+
+    print(Fore.LIGHTRED_EX + "Failed to get durov info")
+    return False
+
+
+def post_durov(headers: dict, max_attempts: int):
+    print(Fore.YELLOW + Style.BRIGHT + "Attempting to post durov info......")
+    url = "https://major.bot/api/durov/"
+
+    numbers = list(range(1, 17))
+    chosen_list = list()
+
+    for i in range(4):
+        chosen_number = random.choice(numbers)
+        chosen_list.append(chosen_number)
+        numbers.remove(chosen_number)
+
+    body = {"choice_1": chosen_list[0], "choice_2": chosen_list[1], "choice_3": chosen_list[2], "choice_4": chosen_list[3]}
+    for _ in range(max_attempts):
+        response = requests.get(url=url, headers=headers, json=body)
+        if response.status_code == 200:
+            print(Fore.LIGHTGREEN_EX + f"Successful!: {response.json()}")
+            time.sleep(2)
+            return True
+        else:
+            print(Fore.LIGHTBLACK_EX + f"Error: status code {response.status_code}")
+            print(Fore.LIGHTBLACK_EX + "Attempting to reconnect")
+            time.sleep(2)
+
+    print(Fore.LIGHTRED_EX + "Failed to post durov info")
+    return False
+
+
 def main():
     try:
         print_name()
@@ -353,6 +402,9 @@ def main():
                 if get_swipe_game(headers, 3):
                     time.sleep(60)
                     post_swipe_game(headers, 3)
+                if get_durov(headers, 3):
+                    time.sleep(10)
+                    post_durov(headers, 3)
 
                 time.sleep(3.5)
                 clear_console()
