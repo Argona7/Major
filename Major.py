@@ -137,13 +137,15 @@ def post_task(task: int, name_task: str, headers: dict, max_attempts: int):
     for _ in range(max_attempts):
         response = requests.post(url=url, headers=headers, json=body)
         if response.status_code == 201:
-            if response.json()["is_completed"]:
+            if response.json().get("is_completed"):
                 print(Fore.LIGHTGREEN_EX + "Successful!")
             else:
                 print(Fore.LIGHTRED_EX + "Failure")
             time.sleep(2)
             return True
         else:
+            if response.json().get("detail"):
+                break
             print(Fore.LIGHTBLACK_EX + f"Error: status code {response.status_code}")
             print(Fore.LIGHTBLACK_EX + "Attempting to reconnect")
             time.sleep(2)
